@@ -1,0 +1,51 @@
+{
+    "microfinance": [
+        "fastmoney",
+        "evenfastermoney",
+        "chingching",
+        "eloan",
+        "moneyalmostfree"
+    ],
+    "gambling": [
+        "ifelucky",
+        "youwinbig",
+        "casinoslots",
+        "pokerface",
+        "vegaswinner"
+    ],
+    "bank": [
+        "trustusbank",
+        "winstonsmithbank",
+        "aboveeastereggbank",
+        "dogebank",
+        "realrealtruetruebank"
+    ],
+    "grocery": [
+        "kimsconvenience",
+        "seveneleven",
+        "eighttwelve",
+        "cornerstore",
+        "matchbox",
+        "mrkt"
+    ],
+    "entertainment": [
+        "everglades",
+        "webflix",
+        "kissneiplus",
+        "tulu",
+        "hichatgpt"
+    ],
+    "utilities": [
+        "rosesarered",
+        "wateriswet",
+        "electicityincity",
+        "ourgasdoesntstink",
+        "awesomeinternet",
+        "booringinternet"
+    ],
+    "insurance": [
+        "firenotaproblem",
+        "mediocremedicine",
+        "notmyfaultinsurance"
+    ]
+}
