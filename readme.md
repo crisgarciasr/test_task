@@ -1,58 +1,108 @@
-# Test Assignment Overview
+# 🚀 Test Task – Feature Engineering & Scoring Microservice
 
-Welcome to the test assignment! This repository is designed to simulate a simplified yet realistic production environment. By completing this assignment, you will gain insight into the types of tasks and challenges you might encounter in a real-world scenario. The goal is to walk through the entire process of implementing a new scorecard, from feature engineering to business logic development.
-
----
-
-## 🛠 Setup Instructions
-
-1. **Clone the Repository**
-
-   ```bash
-   git clone <repository-url>
-   cd <repository-folder>
-   ```
-
-2. **Install Dependencies**
-
-   Make sure you have Python 3.10 or higher installed. It is recommended to use Python >= 3.10 for compatibility.
-
-   Create a virtual environment and install the required dependencies:
-
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+This repository contains the solution to a two-part technical task focused on:
+1. Feature engineering using SQL
+2. Business decision logic implemented as a Python microservice
 
 ---
 
-## 📋 Assignment Structure
+## 📊 Part 1: SQL Task – Feature Engineering
 
-The assignment is divided into two main parts:
+The goal is to calculate 5 features per client based on a SQLite database, using only SQL.
 
-1. **SQL Task**
+### ✅ Features Calculated
 
-   - Focuses on feature engineering using SQL.
-   - Detailed instructions can be found in the `sql_task` folder.
+| Feature Name | Description |
+|-------------|-------------|
+| `vendor_microfinance_gambling_payment_ratio_l12m` | Ratio of payments to microfinance and gambling merchants vs. total vendor payments (last 12 months) |
+| `vendor_grocery_utilities_transaction_ratio_l9m` | Ratio of grocery and utilities transactions vs. total vendor transactions (last 9 months) |
+| `history_payment_delay_flag_l6m` | Boolean flag indicating if any payment was delayed (last 6 months) |
+| `history_payment_ratio_l9m_to_total` | Ratio of income-type payments (last 9 months) to total historical income payments |
+| `history_average_loan_profit_margin_l12m` | Average loan profit margin for loans issued in the last 12 months |
 
-2. **Python Task**
-   - Involves implementing business logic for a new scorecard.
-   - Detailed instructions can be found in the `python_task` folder.
+### 🛠 Tech
 
----
+- SQL dialect: **SQLite**
+- All queries are in `query.sql`
+- Data is generated using:
 
-## 🚀 Suggested Workflow
+### 🛠️ Usage
 
-1. Start with the **SQL Task** to calculate the required features.
-2. Move on to the **Python Task** to implement the decision-making logic.
+#### Generate the database
 
-Each task folder contains its own detailed instructions and examples to guide you through the process.
+```bash
+python -m sql_task.data_generator
+```
 
----
+#### Validate the query with:
+```bash
+python -m sql_task.runner
+```
 
-## 🎉 Good Luck!
+### 💡 Notes
+- Vendor names are partially masked → handled using pattern matching with LIKE.
 
-We hope you enjoy working on this assignment. If you have any questions, feel free to reach out. Good luck!
+- Features return NULL if no relevant data is available.
 
-![cat typing](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdTBqeTVnOGY5a2VxN2JvOWY5ZndlaGk1cXZhdXhhMGJwZXB3OGR2diZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7NoNw4pMNTvgc/giphy.gif)
+- Calculations are scoped to the current :client_id.
+
+## 🧠 Part 2: Python Task – Business Decision Microservice
+
+Implements the logic for score-based decisions using a microservice.
+
+### 🔁 Strategies Implemented
+
+| Strategy                     | Description                                                                                       |
+|-----------------------------|---------------------------------------------------------------------------------------------------|
+| `pure_stream_strategy`      | Applied to 5% of requests (deterministically via hash). Always returns `"1"` with loan 8000 over 6 months |
+| `new_client_strategy`       | Applied if `client_type == "new"`. Approves (`"1"`) if `score < 0.15`, with loan 6000 over 3 months |
+| `repeat_client_strategy`    | Applied if `client_type == "repeat"` and phone does **not** end in 2 or 4. Approves if `score < 0.20`, loan 12000 over 6 months |
+| `pilot_repeat_client_strategy` | Applied if `client_type == "repeat"` and phone **ends in 2 or 4**. Approves if `score < 0.18`, loan 24000 over 12 months |
+
+### 🛠️ Usage
+
+#### Generate test data:
+```bash
+python -m python_task.data_generator
+```
+#### Run the microservice:
+
+```bash
+python -m python_task.runner
+```
+
+#### Check strategy usage distribution:
+```bash
+python -m python_task.result_lookup
+```
+
+### 📁 Data Structure
+
+#### The microservice reads:
+
+| File                                  | Description                             |
+|---------------------------------------|-----------------------------------------|
+| `Application/Application.json`        | Contains `request_id`, `client_type`    |
+| `SqlIntegration/SqlIntegration.json`  | Contains `phone_number`, `age`, `name`  |
+| `PythonScoring-vX/PythonScoring.json` | Contains the `score` value (versioned)  |
+
+### 🧱 Tech & Architecture
+- Main logic: python_task/scoring.py
+
+- Deterministic 5% stream using hash(request_id) % 100 < 5
+
+- Uses Pydantic models for I/O (see src/models)
+
+- Fully exception-safe and traceable
+
+### ✅ Highlights
+- Clean, modular structure
+
+- Fully documented
+
+- Robust to missing files and errors
+
+- Compatible with any PythonScoring version folders
+
+### 🤝 Author
+Developed as part of a technical challenge, with focus on clarity, robustness and business logic alignment.
